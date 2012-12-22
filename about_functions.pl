@@ -75,6 +75,15 @@ sub about_scalar_functions {
     is ($new_line, __, 'substr(string, offset, length, replacement) - retuns modified string substituting the characters at offset+length with replacement');
     
     is (reverse($str), __, 'reverse() in a scalar context reverse the order of the characters in the string');
+
+	# see `perldoc -f sprintf` for a complete list of modifiers
+	is (sprintf('%s', uc('foo')), __, 'sprintf() uses [%s] to format parameters as strings');
+	is (sprintf('%i', 3.50),      __, 'sprintf() uses [%i] to format parameters as integers');
+	is (sprintf('%x', 42),        __, 'sprintf() uses [%x] to format parameters as hex numbers');
+	is (sprintf('%f', 27),        __, 'sprintf() uses [%f] to format parameters as floating point numbers');
+	
+	is (sprintf('%d, %f', 10**100, 10**199),                      __, 'sprintf() allows multiple, different modifiers');
+	is (sprintf('http://%s:%s/%s', 'google.com', '80', 'search'), __, 'common usage of sprintf()');
     
     return (Perl::Koans::get_return_code()); 
 }
@@ -87,12 +96,11 @@ sub about_numeric_functions {
     is (sqrt(64),          __, 'sqrt() returns the square root of a number'); # more in about_math.pl
     
     is (hex('0xFF'),       __, 'hex() returns the decimal value of a hex number'); # this always trips people up, if you want to turn a decimal into a hex, use printf/sprintf/unpack    
-    is (sprintf('%x', __), __, 'sprintf() can turn decimal numbers into hex numbers'); # TODO this hint is crap, and we just covered %x in sprintf, but i still feel like we need this
     is (int(100.50),       __, 'int() returns an integer');
-    
-    is (oct(100),          __, 'oct(octal)  returns the corresponding value');
-    is (oct(0xFF),         __, 'oct(hex)    returns the corresponding value');
-    is (oct(0b11011),      __, 'oct(binary) returns the corresponding value');
+	
+    is (oct(100),     __, 'oct(octal)  returns the corresponding value');
+    is (oct(0xFF),    __, 'oct(hex)    returns the corresponding value');
+    is (oct(0b11011), __, 'oct(binary) returns the corresponding value');
     
     # less-commonly used numeric functions
     my ($y, $x) = (5, 20);
@@ -185,7 +193,7 @@ sub about_file_functions {
     }
     
     # mkdir, opendir, rmdir
-    my $new_dir = sprintf('/tmp/fizzbang.%s', $$); # attempting a unique directory, if you're on Windows, please update to C:\Temp or something similar
+    my $new_dir = ($^O =~ /MSWin/i) ? sprintf('C:\Windows\Temp\fizzbang.%s', $$) : sprintf('/tmp/fizzbang.%s', $$); 
     
     if (-d $new_dir) {
         die "DIE:: a testing directory, [$new_dir], appears to already exist on your system";
@@ -199,7 +207,8 @@ sub about_file_functions {
     my $new_filename   = printf('%s/xyzzy.txt', $new_dir);
     my $rename_results = rename($filename, $new_filename);
     
-    is ($rename_results,  __, 'rename() is akin to move'); # TODO need to mention the windows weirdness re: cross drive renames?
+	warn 'NOTE:: you cannot use rename() across drives on Windows' if $^O =~ /MSWin/i;
+    is ($rename_results,  __, 'rename() is akin to move');
     is (-f $filename,     __, 'rename() is akin to move -- part 2');
     is (-f $new_filename, __, 'rename() is akin to move -- part 3');    
     
@@ -231,7 +240,7 @@ sub about_file_functions {
         my $link = '/tmp/test.lnk'; 
         my $link_results = link($0, $link);
         
-        is (-f $link, __, 'link(src, dst) creates a hard link from src to dst'); # TODO potential issue here: when trying this on my wsl, i get:  'Invalid cross-device link', despite the fact we aren't doing a cross-device link
+        is (-f $link, __, 'link(src, dst) creates a hard link from src to dst'); # TODO potential issue here: when trying this on my wsl, i get:  'Invalid cross-device link', could be related to the software raid?
         
         my $sym_link = '/tmp/test_sym.lnk';
         my $sym_link_results = symlink($0, $sym_link);
