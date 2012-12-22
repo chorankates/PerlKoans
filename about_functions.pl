@@ -75,15 +75,6 @@ sub about_scalar_functions {
     is ($new_line, __, 'substr(string, offset, length, replacement) - retuns modified string substituting the characters at offset+length with replacement');
     
     is (reverse($str), __, 'reverse() in a scalar context reverse the order of the characters in the string');
-
-	# see `perldoc -f sprintf` for a complete list of modifiers
-	is (sprintf('%s', uc('foo')), __, 'sprintf() uses [%s] to format parameters as strings');
-	is (sprintf('%i', 3.50),      __, 'sprintf() uses [%i] to format parameters as integers');
-	is (sprintf('%x', 42),        __, 'sprintf() uses [%x] to format parameters as hex numbers');
-	is (sprintf('%f', 27),        __, 'sprintf() uses [%f] to format parameters as floating point numbers');
-	
-	is (sprintf('%d, %f', 10**100, 10**199),                      __, 'sprintf() allows multiple, different modifiers');
-	is (sprintf('http://%s:%s/%s', 'google.com', '80', 'search'), __, 'common usage of sprintf()');
     
     return (Perl::Koans::get_return_code()); 
 }
