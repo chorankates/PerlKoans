@@ -31,7 +31,7 @@
 package Perl::Koans::Functions;
 use warnings;
 
-use Cwd; # TODO should we make a note about this?
+use Cwd;
 
 use lib './lib';
 use Perl::Koans;
@@ -110,9 +110,24 @@ sub about_numeric_functions {
     is (int(rand(100)) < 100,           __, 'int() often wraps rand() to get whole numbers');
     isnt ($colors[int(rand($#colors))], __, 'putting it all together'); # TODO write a better hint here, but i mean for this to be complex
     
-	# TODO  write some tests here
-    # can't mention rand() without srand() -- that's seed rand, not secure rand: http://perldoc.perl.org/functions/srand.html
-    
+	# srand() is seed rand, not secure rand: http://perldoc.perl.org/functions/srand.html
+    my $known_seed = 100;
+	my $rando_seed = rand(1000);
+	
+	my ($first, $second, $third);
+	
+	srand($known_seed);
+	$first = rand();
+	
+	srand($rando_seed);
+	$second = rand();
+	
+	srand($known_seed);
+	$third = rand();
+	
+	is   ($first, __, 'when reusing a seed, rand() is predictable');
+	isnt ($first, __, 'when using a new seed, rand() is ~unpredicatable');
+	
     return (Perl::Koans::get_return_code()); 
 
 }
@@ -243,7 +258,7 @@ sub about_file_functions {
         
         # similar to stat(), covered in about_files.pl, lstat() gives information about the symbolic link -- not the file it points to
         my @lstat = lstat($sym_link);
-        is ($stat[4],  __, "the 4th index of stat is UID of file owner"); # unless they know their UID/GID, expect them to rely on the test failures
+        is ($stat[4],  __, "the 4th index of stat is UID of file owner");
         is ($stat[5],  __, "the 5th index of stat is GID of file owner");
         
         $unlink_results = unlink($link, $sym_link);
@@ -251,6 +266,7 @@ sub about_file_functions {
         
     }
     
+    chdir($cwd); # are you to good for your home?!
     return (Perl::Koans::get_return_code()); 
 }
 
